@@ -1,0 +1,83 @@
+[
+  {
+    "metadataOutputVersion" : "3.0",
+    "shortDescription" : "Drawing classifier created by Turi Create (version 5.5)",
+    "outputSchema" : [
+      {
+        "isOptional" : "0",
+        "keyType" : "Int64",
+        "formattedType" : "Dictionary (Int64 → Double)",
+        "type" : "Dictionary",
+        "name" : "labelProbabilities",
+        "shortDescription" : "Probability of each digit"
+      },
+      {
+        "isOptional" : "0",
+        "formattedType" : "Int64",
+        "type" : "Int64",
+        "name" : "classLabel",
+        "shortDescription" : "Most likely digit"
+      }
+    ],
+    "storagePrecision" : "Float32",
+    "modelParameters" : [
+
+    ],
+    "author" : "Apple, Inc.",
+    "specificationVersion" : 1,
+    "license" : "https:\/\/docs-assets.developer.apple.com\/coreml\/models\/Image\/DrawingClassification\/MNISTClassifier\/LICENSE-MIT.txt For information about the dataset, please see http:\/\/yann.lecun.com\/exdb\/mnist\/.",
+    "computePrecision" : "Float16",
+    "isUpdatable" : "0",
+    "availability" : {
+      "macOS" : "10.13",
+      "tvOS" : "11.0",
+      "watchOS" : "4.0",
+      "iOS" : "11.0",
+      "macCatalyst" : "11.0"
+    },
+    "modelType" : {
+      "name" : "MLModelType_neuralNetworkClassifier"
+    },
+    "inputSchema" : [
+      {
+        "height" : "28",
+        "colorspace" : "Grayscale",
+        "isOptional" : "0",
+        "width" : "28",
+        "isColor" : "0",
+        "formattedType" : "Image (Grayscale 28 × 28)",
+        "hasSizeFlexibility" : "0",
+        "type" : "Image",
+        "shortDescription" : "Image of the digit drawing to be classified",
+        "name" : "image"
+      }
+    ],
+    "classLabels" : [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "generatedClassName" : "MNISTClassifier",
+    "userDefinedMetadata" : {
+      "com.apple.developer.machine-learning.models.version" : "1.0",
+      "com.apple.developer.machine-learning.models.name" : "MNISTClassifier.mlmodel",
+      "com.apple.developer.machine-learning.models.category" : "image"
+    },
+    "neuralNetworkLayerTypeHistogram" : {
+      "PoolingMax" : 3,
+      "Convolution" : 3,
+      "InnerProduct" : 2,
+      "Softmax" : 1,
+      "ActivationReLU" : 4,
+      "Flatten" : 1
+    },
+    "method" : "predict"
+  }
+]

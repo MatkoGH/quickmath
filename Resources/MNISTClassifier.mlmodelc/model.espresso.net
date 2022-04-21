@@ -1,0 +1,247 @@
+{
+  "layers" : [
+    {
+      "pad_r" : 0,
+      "fused_relu" : 1,
+      "fused_tanh" : 0,
+      "debug_info" : "drawing_conv0_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "top" : "drawing_conv0_relu_fwd",
+      "blob_weights" : 3,
+      "K" : 1,
+      "blob_biases" : 1,
+      "name" : "drawing_conv0_fwd",
+      "has_batch_norm" : 0,
+      "type" : "convolution",
+      "n_groups" : 1,
+      "pad_t" : 0,
+      "has_biases" : 1,
+      "C" : 16,
+      "bottom" : "image",
+      "weights" : {
+
+      },
+      "Nx" : 3,
+      "pad_mode" : 4,
+      "pad_value" : 0,
+      "Ny" : 3,
+      "n_parallel" : 1
+    },
+    {
+      "pad_r" : 0,
+      "debug_info" : "drawing_pool0_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "size_x" : 2,
+      "top" : "drawing_pool0_fwd",
+      "top_shape_style" : 0,
+      "stride_x" : 2,
+      "avg_or_max" : 1,
+      "average_count_exclude_padding" : 0,
+      "type" : "pool",
+      "name" : "drawing_pool0_fwd",
+      "pad_t" : 0,
+      "stride_y" : 2,
+      "bottom" : "drawing_conv0_relu_fwd",
+      "weights" : {
+
+      },
+      "pad_mode" : 2,
+      "size_y" : 2,
+      "pad_value" : 0
+    },
+    {
+      "pad_r" : 0,
+      "fused_relu" : 1,
+      "fused_tanh" : 0,
+      "debug_info" : "drawing_conv1_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "top" : "drawing_conv1_relu_fwd",
+      "blob_weights" : 7,
+      "K" : 16,
+      "blob_biases" : 5,
+      "name" : "drawing_conv1_fwd",
+      "has_batch_norm" : 0,
+      "type" : "convolution",
+      "n_groups" : 1,
+      "pad_t" : 0,
+      "has_biases" : 1,
+      "C" : 32,
+      "bottom" : "drawing_pool0_fwd",
+      "weights" : {
+
+      },
+      "Nx" : 3,
+      "pad_mode" : 4,
+      "pad_value" : 0,
+      "Ny" : 3,
+      "n_parallel" : 1
+    },
+    {
+      "pad_r" : 0,
+      "debug_info" : "drawing_pool1_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "size_x" : 2,
+      "top" : "drawing_pool1_fwd",
+      "top_shape_style" : 0,
+      "stride_x" : 2,
+      "avg_or_max" : 1,
+      "average_count_exclude_padding" : 0,
+      "type" : "pool",
+      "name" : "drawing_pool1_fwd",
+      "pad_t" : 0,
+      "stride_y" : 2,
+      "bottom" : "drawing_conv1_relu_fwd",
+      "weights" : {
+
+      },
+      "pad_mode" : 2,
+      "size_y" : 2,
+      "pad_value" : 0
+    },
+    {
+      "pad_r" : 0,
+      "fused_relu" : 1,
+      "fused_tanh" : 0,
+      "debug_info" : "drawing_conv2_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "top" : "drawing_conv2_relu_fwd",
+      "blob_weights" : 11,
+      "K" : 32,
+      "blob_biases" : 9,
+      "name" : "drawing_conv2_fwd",
+      "has_batch_norm" : 0,
+      "type" : "convolution",
+      "n_groups" : 1,
+      "pad_t" : 0,
+      "has_biases" : 1,
+      "C" : 64,
+      "bottom" : "drawing_pool1_fwd",
+      "weights" : {
+
+      },
+      "Nx" : 3,
+      "pad_mode" : 4,
+      "pad_value" : 0,
+      "Ny" : 3,
+      "n_parallel" : 1
+    },
+    {
+      "pad_r" : 0,
+      "debug_info" : "drawing_pool2_fwd",
+      "pad_fill_mode" : 0,
+      "pad_b" : 0,
+      "pad_l" : 0,
+      "size_x" : 2,
+      "top" : "drawing_pool2_fwd",
+      "top_shape_style" : 0,
+      "stride_x" : 2,
+      "avg_or_max" : 1,
+      "average_count_exclude_padding" : 0,
+      "type" : "pool",
+      "name" : "drawing_pool2_fwd",
+      "pad_t" : 0,
+      "stride_y" : 2,
+      "bottom" : "drawing_conv2_relu_fwd",
+      "weights" : {
+
+      },
+      "pad_mode" : 2,
+      "size_y" : 2,
+      "pad_value" : 0
+    },
+    {
+      "bottom" : "drawing_pool2_fwd",
+      "weights" : {
+
+      },
+      "mode" : 0,
+      "nd_axis" : 0,
+      "debug_info" : "drawing_flatten0_reshape0",
+      "top" : "drawing_flatten0_reshape0",
+      "type" : "flatten",
+      "name" : "drawing_flatten0_reshape0"
+    },
+    {
+      "nB" : 576,
+      "top" : "drawing_dense0_relu_fwd",
+      "has_biases" : 1,
+      "weights" : {
+
+      },
+      "nC" : 128,
+      "blob_weights" : 15,
+      "type" : "inner_product",
+      "has_relu" : 1,
+      "bottom" : "drawing_flatten0_reshape0",
+      "blob_biases" : 13,
+      "has_tanh" : 0,
+      "debug_info" : "drawing_dense0_fwd",
+      "name" : "drawing_dense0_fwd",
+      "has_prelu" : 0
+    },
+    {
+      "nB" : 128,
+      "top" : "drawing_dense1_fwd",
+      "has_biases" : 1,
+      "weights" : {
+
+      },
+      "nC" : 10,
+      "blob_weights" : 19,
+      "type" : "inner_product",
+      "has_relu" : 0,
+      "bottom" : "drawing_dense0_relu_fwd",
+      "blob_biases" : 17,
+      "has_tanh" : 0,
+      "debug_info" : "drawing_dense1_fwd",
+      "name" : "drawing_dense1_fwd",
+      "has_prelu" : 0
+    },
+    {
+      "bottom" : "drawing_dense1_fwd",
+      "attributes" : {
+        "is_output" : 1
+      },
+      "weights" : {
+
+      },
+      "debug_info" : "labelProbabilities",
+      "top" : "labelProbabilities",
+      "C" : 2,
+      "type" : "softmax",
+      "name" : "labelProbabilities"
+    }
+  ],
+  "transform_params" : {
+    "image" : {
+      "bias_a" : 0,
+      "bias_g" : 0,
+      "bias_r" : 0,
+      "bias_b" : 0,
+      "center_mean" : 0,
+      "is_network_bgr" : 0,
+      "scale" : 0.0039215688593685627
+    }
+  },
+  "storage" : "model.espresso.weights",
+  "metadata_in_weights" : [
+
+  ],
+  "properties" : {
+
+  },
+  "analyses" : {
+
+  },
+  "format_version" : 200
+}

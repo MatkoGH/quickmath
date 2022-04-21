@@ -1,0 +1,70 @@
+{
+  "layer_shapes" : {
+    "drawing_pool2_fwd" : {
+      "k" : 64,
+      "w" : 3,
+      "n" : 1,
+      "h" : 3
+    },
+    "drawing_conv0_relu_fwd" : {
+      "k" : 16,
+      "w" : 28,
+      "n" : 1,
+      "h" : 28
+    },
+    "labelProbabilities" : {
+      "k" : 10,
+      "w" : 1,
+      "n" : 1,
+      "h" : 1
+    },
+    "drawing_conv2_relu_fwd" : {
+      "k" : 64,
+      "w" : 7,
+      "n" : 1,
+      "h" : 7
+    },
+    "drawing_pool1_fwd" : {
+      "k" : 32,
+      "w" : 7,
+      "n" : 1,
+      "h" : 7
+    },
+    "image" : {
+      "k" : 1,
+      "w" : 28,
+      "n" : 1,
+      "h" : 28
+    },
+    "drawing_conv1_relu_fwd" : {
+      "k" : 32,
+      "w" : 14,
+      "n" : 1,
+      "h" : 14
+    },
+    "drawing_dense0_relu_fwd" : {
+      "k" : 128,
+      "w" : 1,
+      "n" : 1,
+      "h" : 1
+    },
+    "drawing_pool0_fwd" : {
+      "k" : 16,
+      "w" : 14,
+      "n" : 1,
+      "h" : 14
+    },
+    "drawing_flatten0_reshape0" : {
+      "k" : 576,
+      "w" : 1,
+      "n" : 1,
+      "h" : 1
+    },
+    "drawing_dense1_fwd" : {
+      "k" : 10,
+      "w" : 1,
+      "n" : 1,
+      "h" : 1
+    }
+  }
+}
