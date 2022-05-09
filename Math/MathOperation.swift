@@ -8,7 +8,7 @@
 import Foundation
 
 /// An enum for math operations.
-enum MathOperation {
+enum MathOperation: Codable {
     
     /// Addition math operation.
     case addition
@@ -23,10 +23,10 @@ enum MathOperation {
     case division
     
     /// An array of all math operations.
-    static var all: [Self] = [.addition, .subtraction, .multiplication, .division]
+    static let all: [Self] = [.addition, .subtraction, .multiplication, .division]
     
     /// An array of math operations, using the BEDMAS order of operations.
-    static var orderOfOperations: [Self] = [.division, .multiplication, .addition, .subtraction]
+    static let orderOfOperations: [Self] = [.division, .multiplication, .addition, .subtraction]
     
     /// The name of the math operation.
     var name: String {
@@ -62,5 +62,25 @@ enum MathOperation {
     /// - Parameter operations: An array of operations
     static func selectRandom(from operations: [MathOperation]) -> MathOperation {
         operations.randomElement() ?? MathOperation.all.randomElement()!
+    }
+}
+
+// MARK: - Comparable
+
+extension MathOperation: Comparable {
+    
+    static func > (lhs: MathOperation, rhs: MathOperation) -> Bool {
+        switch (lhs, rhs) {
+        case (.addition, .subtraction): return true
+        case (.addition, .multiplication): return true
+        case (.addition, .division): return true
+            
+        case (.subtraction, .multiplication): return true
+        case (.subtraction, .division): return true
+            
+        case (.multiplication, .division): return true
+            
+        default: return false
+        }
     }
 }

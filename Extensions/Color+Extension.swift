@@ -9,6 +9,9 @@ import SwiftUI
 
 extension Color {
     
+    /// Get a color based on a provided percentage.
+    /// - Parameter percentage: The percentage.
+    /// - Returns: The color based on the percentage.
     static func percentageColor(for percentage: Int?) -> Self {
         guard let percentage = percentage else {
             return .gray

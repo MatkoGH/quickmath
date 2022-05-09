@@ -9,6 +9,9 @@ import UIKit
 
 extension UIImage {
     
+    /// Resizes an image to a provided size.
+    /// - Parameter size: The CGSize to resize the image to.
+    /// - Returns: An optional resized image.
     public func resizeImageTo(size: CGSize) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
         self.draw(in: CGRect(origin: .zero, size: size))
@@ -20,6 +23,8 @@ extension UIImage {
         return resizedImage
     }
     
+    /// Converts the image to a CVPixelBuffer.
+    /// - Returns: An optional CVPixelBuffer.
     public func pixelBuffer() -> CVPixelBuffer? {
         let attributes = [
             kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
@@ -66,6 +71,8 @@ extension UIImage {
         return pixelBuffer
     }
     
+    /// Converts the current image to a square by adding horizontal or vertical padding.
+    /// - Returns: An optional square image.
     public func asSquare() -> UIImage {
         if size.width == size.height {
             return self
@@ -86,6 +93,9 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext() ?? self
     }
     
+    /// Adds padding to the edge of an image.
+    /// - Parameter insets: The insets to add to each edge.
+    /// - Returns: The padded image.
     public func withInsets(insets: UIEdgeInsets) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(.init(width: self.size.width + insets.left + insets.right, height: self.size.height + insets.top + insets.bottom), false, self.scale)
         defer { UIGraphicsEndImageContext() }
@@ -98,6 +108,9 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext() ?? self
     }
     
+    /// Tints the image to the provided color.
+    /// - Parameter tintColor: The color to tint the image to.
+    /// - Returns: The tinted image.
     public func withTintColor(tintColor: UIColor) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
         defer { UIGraphicsEndImageContext() }
@@ -115,6 +128,11 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext() ?? self
     }
     
+    /// Adds a colored background to the image.
+    /// - Parameters:
+    ///   - color: The color to set the background to.
+    ///   - opaque: Boolean indicating whether the background should be opaque. Defaults to true.
+    /// - Returns: The image with the background.
     public func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
         

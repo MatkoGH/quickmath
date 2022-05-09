@@ -10,18 +10,25 @@ import PencilKit
 
 // MARK: - DrawingView
 
+/// A UIViewRepresentable that has a PencilKit canvas, which does not have its own SwiftUI view.
 struct DrawingView: UIViewRepresentable {
     
+    /// The canvas view to display.
     @Binding var canvasView: PKCanvasView
     
-    var onSaved: (PKDrawing) -> Void
+    /// A handler to call upon a change in the canvas view's drawing.
+    var onChanged: (PKDrawing) -> Void
     
     func makeUIView(context: Context) -> PKCanvasView {
-        canvasView.tool = PKInkingTool(ink: .init(.pen, color: .white), width: 16)
+        canvasView.tool = PKInkingTool(.pen, color: UIColor(.white), width: 16)
         canvasView.delegate = context.coordinator
         canvasView.drawingPolicy = .anyInput
         
+        // Pen color is broken in dark mode, so make it light.
+        canvasView.overrideUserInterfaceStyle = .light
+        
         canvasView.backgroundColor = .clear
+        canvasView.isOpaque = false
         
         return canvasView
     }
@@ -47,7 +54,7 @@ extension DrawingView {
         
         func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
             self.removeUnnecessaryStrokes(from: canvasView)
-            self.runOnSavedIfNecessary(drawing: canvasView.drawing)
+            self.runOnChangedIfNecessary(drawing: canvasView.drawing)
         }
         
         func removeUnnecessaryStrokes(from canvasView: PKCanvasView) {
@@ -60,9 +67,9 @@ extension DrawingView {
             }
         }
         
-        func runOnSavedIfNecessary(drawing: PKDrawing) {
+        func runOnChangedIfNecessary(drawing: PKDrawing) {
             if !drawing.strokes.isEmpty {
-                parent.onSaved(drawing)
+                parent.onChanged(drawing)
             }
         }
     }

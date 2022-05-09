@@ -16,8 +16,8 @@ let package = Package(
         .iOSApplication(
             name: "QuickMath",
             targets: ["AppModule"],
-            bundleIdentifier: "ca.martinstric.QuickMath",
-            teamIdentifier: "88XU89TSNP",
+            bundleIdentifier: "ca.martinstric.ova.QuickMath",
+            teamIdentifier: "586LPJ38CH",
             displayVersion: "1.0",
             bundleVersion: "1",
             iconAssetName: "AppIcon",

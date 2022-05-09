@@ -1,5 +1,5 @@
 //
-//  QuizInfoView.swift
+//  QuizControlsView.swift
 //  QuickMath
 //
 //  Created by Martin Stric on 2022-04-17.
@@ -7,19 +7,27 @@
 
 import SwiftUI
 
-struct QuizInfoView: View {
+struct QuizControlsView: View {
     
+    /// The quiz object passed down in the environment.
     @EnvironmentObject var quiz: Quiz
+    
+    /// The question to show controls for.
     @ObservedObject var question: Quiz.Question
     
-    @Namespace private var quizInfoNamespace
-    
+    /// Boolean indicating whether the skip button has been tapped once.
     @State private var skipTapped: Bool = false
+    
+    /// Boolean indicating whether to show the alert for exiting the active quiz.
+    @State private var isExiting: Bool = false
     
     var body: some View {
         VStack {
             HStack(alignment: .top, spacing: 16) {
-                currentInfoView
+                HStack(spacing: 8) {
+                    exitButtonView
+                    currentInfoView
+                }
                 Spacer()
                 timeView
             }
@@ -27,8 +35,8 @@ struct QuizInfoView: View {
             HStack(alignment: .bottom, spacing: 16) {
                 predictionView
                 Spacer()
-                if case .answering(let number) = question.answerState {
-                    answeringControls(number: number)
+                if !question.hasAnswered() {
+                    answeringControls(number: question.answer)
                 }
             }
         }
@@ -37,23 +45,50 @@ struct QuizInfoView: View {
     var currentInfoView: some View {
         Group {
             if let percentage = quiz.correctPercentage {
-                Text("\(percentage.toString(minimumNumberCount: 2))%")
-                    .font(.body.weight(.medium).monospacedDigit())
+                Text("\(percentage.toString())%")
                     .foregroundColor(.percentageColor(for: percentage))
-                    .transition(.opacity)
             } else {
                 Text("--%")
-                    .font(.body.weight(.medium).monospacedDigit())
                     .foregroundColor(.secondary)
-                    .transition(.opacity)
             }
         }
+        .font(.body.weight(.medium).monospacedDigit())
         .padding(style: .small)
         .roundBackground(material: .ultraThinMaterial)
+        .transition(.opacity)
+    }
+    
+    var exitButtonView: some View {
+        Button {
+            isExiting = true
+        } label: {
+            Label("Exit", systemImage: "chevron.left")
+                .font(.body.weight(.medium))
+        }
+        .tint(.red)
+        .padding(style: .small)
+        .roundBackground(material: .ultraThinMaterial)
+        .hoverEffect(.lift)
+        .alert("Are you sure?", isPresented: $isExiting) {
+            Button(role: .destructive) {
+                withAnimation(.defaultSpring) { quiz.restart() }
+                isExiting = false
+            } label: {
+                Text("Exit")
+            }
+
+            Button(role: .cancel) {
+                isExiting = false
+            } label: {
+                Text("Cancel")
+            }
+        } message: {
+            Text("Exiting will make you lose your current quiz progress.")
+        }
     }
     
     var timeView: some View {
-        Label("\(quiz.timeTaken.toTimeString())", systemImage: "clock")
+        Label("\(quiz.timeTaken.toString())", systemImage: "clock")
             .font(.body.weight(.medium).monospacedDigit())
             .foregroundColor(.primary)
             .padding(style: .small)
@@ -62,12 +97,12 @@ struct QuizInfoView: View {
     
     var predictionView: some View {
         Group {
-            if case .answering(let number) = question.answerState, let number = number {
+            if let answer = question.answer, !question.hasAnswered() {
                 HStack(spacing: 8) {
                     Image(systemName: "text.viewfinder")
                         .font(.title2)
                     VStack(alignment: .leading) {
-                        Text("My prediction: \(number)")
+                        Text("My prediction: \(answer)")
                             .font(.body.weight(.medium))
                         Text("I may not recognize numbers correctly.")
                             .font(.callout)
@@ -77,7 +112,7 @@ struct QuizInfoView: View {
                 .padding(style: .small)
                 .roundBackground(material: .ultraThinMaterial)
                 .transition(.opacity)
-            } else if case .answered(let isCorrect) = question.answerState {
+            } else if let isCorrect = question.answerState?.isCorrect {
                 HStack(spacing: 8) {
                     Image(systemName: isCorrect ? "checkmark" : "xmark")
                         .font(.title2.bold())
@@ -117,12 +152,12 @@ struct QuizInfoView: View {
         HStack {
             Button {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.9, blendDuration: 0.5)) {
-                    question.clearAnswer()
+                    question.clearDrawing()
                 }
             } label: {
                 Label("Clear", systemImage: "trash.fill")
             }
-            .buttonStyle(.quizInfoStyle(color: .constant(number != nil ? .red : .gray), isDisabled: number == nil))
+            .buttonStyle(.quizStyle(color: .constant(number != nil ? .red : .gray), isDisabled: number == nil))
             .animation(.spring(response: 0.4, dampingFraction: 1.0), value: question.answerState)
             .disabled(number == nil)
             
@@ -135,7 +170,7 @@ struct QuizInfoView: View {
                         .transition(.opacity)
                 }
             }
-            .buttonStyle(QuizInfoButtonStyle(color: .constant(.orange)))
+            .buttonStyle(QuizButtonStyle(color: .constant(.orange)))
         }
         .fixedSize(horizontal: false, vertical: true)
     }
@@ -154,17 +189,22 @@ struct QuizInfoView: View {
         }
         
         withAnimation(.defaultSpring) {
+            question.skip()
             quiz.nextQuestion()
             skipTapped = false
         }
     }
 }
 
-struct QuizInfoButtonStyle: ButtonStyle {
+struct QuizButtonStyle: ButtonStyle {
     
+    /// A binding for the background color to use.
     @Binding var color: Color
+    
+    /// Boolean indicating whether the button is disabled.
     var isDisabled: Bool = false
     
+    /// Boolean indicating whether the button is being hovered over.
     @State private var isHovering: Bool = false
     
     func makeBody(configuration: Configuration) -> some View {
@@ -172,8 +212,9 @@ struct QuizInfoButtonStyle: ButtonStyle {
             .font(.body.weight(.medium))
             .foregroundColor(.white)
             .colorMultiply(!isDisabled ? .white : .gray)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(style: .default)
-            .frame(maxHeight: .infinity)
+            .frame(maxHeight: .infinity, alignment: .center)
             .background(!isDisabled ? color : .clear)
             .roundBackground(material: .ultraThinMaterial)
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
@@ -182,9 +223,13 @@ struct QuizInfoButtonStyle: ButtonStyle {
     }
 }
 
-extension ButtonStyle where Self == QuizInfoButtonStyle {
+extension ButtonStyle where Self == QuizButtonStyle {
     
-    static func quizInfoStyle(color: Binding<Color>, isDisabled: Bool) -> Self {
+    /// The quiz button style.
+    /// - Parameters:
+    ///   - color: A binding for the background color to use.
+    ///   - isDisabled: Boolean indicating whether the button is disabled.
+    static func quizStyle(color: Binding<Color>, isDisabled: Bool = false) -> Self {
         .init(color: color, isDisabled: isDisabled)
     }
 }

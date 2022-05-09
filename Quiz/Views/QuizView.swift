@@ -9,26 +9,21 @@ import SwiftUI
 
 struct QuizView: View {
  
+    /// The quiz object passed down in the environment.
     @EnvironmentObject var quiz: Quiz
     
     var body: some View {
         Group {
             switch quiz.state {
             case .notStarted:
-                notStartedView
+                QuizSetupView()
             case .running:
                 runningView
             case .ended:
                 QuizEndedView()
             }
         }
-        .onAppear {
-            quiz.start()
-        }
-    }
-    
-    var notStartedView: some View {
-        Text("Not started.")
+        .transition(.moveAcross)
     }
     
     var runningView: some View {
@@ -38,17 +33,17 @@ struct QuizView: View {
                     QuizQuestionView(question: question)
                         .transition(.moveAcross)
                         .onChange(of: question.answerState) { newValue in
-                            if case .answered(_) = newValue {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-                                    withAnimation(.defaultSpring) { quiz.nextQuestion() }
-                                }
+                            guard newValue != nil else { return }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+                                withAnimation(.defaultSpring) { quiz.nextQuestion() }
                             }
                         }
                 }
             }
             
-            QuizInfoView(question: quiz.currentQuestion)
-            .padding(style: .default)
+            QuizControlsView(question: quiz.currentQuestion)
+                .padding(style: .default)
         }
     }
 }

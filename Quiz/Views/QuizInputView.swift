@@ -8,11 +8,16 @@
 import SwiftUI
 import PencilKit
 
+/// A quiz's input view. Can either be a keyboard or a drawing canvas.
 struct QuizInputView: View {
     
+    /// The active quiz question.
     @ObservedObject var question: Quiz.Question
-    @State var color: Color = .gray
     
+    /// Color of the drawing canvas's strokes.
+    @State var color: Color = K.penColor
+    
+    /// The MNIST number classifer.
     let classifier = try? MNISTClassifier(configuration: .init())
     
     var body: some View {
@@ -22,14 +27,16 @@ struct QuizInputView: View {
         .colorMultiply(color)
         .animation(.linear(duration: 0.1), value: color)
         .onChange(of: question.answerState) { newValue in
-            if case .answered(let isCorrect) = newValue {
-                color = isCorrect ? .green : .red
-            } else {
-                color = .gray
+            switch newValue {
+            case .correct: color = .green
+            case .incorrect: color = .red
+            case .skipped: color = .orange
+            default: color = .gray
             }
         }
     }
     
+    /// Attempts to predict a number from a PencilKit drawing.
     func predictNumber(from drawing: PKDrawing) {
         let number = drawing.predictNumber()
         question.answer(number: number)

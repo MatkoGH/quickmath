@@ -13,16 +13,16 @@ import PencilKit
 class Quiz: ObservableObject {
     
     /// The quiz's configuration.
-    let configuration: Configuration
+    @Published var configuration: Configuration
     
     /// The generated questions for the quiz.
     private(set) var questions: [Question]
     
-    /// The current state of the quiz.
-    @Published var state: QuizState = .notStarted
-    
     /// The current question.
     @Published var currentQuestion: Question
+    
+    /// The current state of the quiz.
+    @Published var state: QuizState = .notStarted
     
     /// The amount of time taken, in seconds, since the start of the quiz.
     @Published private(set) var timeTaken: TimeInterval = 0.0
@@ -30,22 +30,27 @@ class Quiz: ObservableObject {
     /// The timer for the quiz.
     private var timer: Timer?
     
-    /// The current question's computed index.
+    // MARK: Computed
+    
+    /// Computed current question's index.
     var currentQuestionIndex: Int {
         questions.firstIndex(where: { currentQuestion.id == $0.id }) ?? 0
     }
     
     /// Computed percentage ratio between correctly-answered and answered questions.
     var correctPercentage: Int? {
-        let answeredQuestions = questions.filter { $0.answerState.isAnswered }
-        let correctQuestions = answeredQuestions.filter { $0.answerState.isCorrect }
+        let answeredQuestions = questions.filter { $0.answerState != nil }
+        let correctQuestions = answeredQuestions.filter { $0.isCorrect() }
         
-        if answeredQuestions.isEmpty {
-            return nil
-        }
+        if answeredQuestions.isEmpty { return nil }
         
-        let rawRatio = Double(correctQuestions.count / answeredQuestions.count)
-        return Int(round(rawRatio * 100))
+        let rawPercentage = (Double(correctQuestions.count) / Double(answeredQuestions.count)) * 100.0
+        return Int(round(rawPercentage))
+    }
+    
+    /// An array of skipped questions.
+    var skippedQuestions: [Question] {
+        questions.filter { $0.answerState == .skipped }
     }
     
     // MARK: Initializer
@@ -53,11 +58,11 @@ class Quiz: ObservableObject {
     /// Create a quiz.
     /// - Parameter configuration: The configuration to use for the quiz.
     init(using configuration: Configuration) {
-        precondition(configuration.amountOfEquations > 0)
+        precondition(configuration.numberOfEquations > 0)
         self.configuration = configuration
         
         self.questions = Self.generateEquations(using: configuration)
-            .map { equation in Question(with: equation) }
+            .map { equation in Question(with: equation, timeToSolve: configuration.solveTime) }
         self.currentQuestion = questions.first!
     }
     
@@ -67,7 +72,7 @@ class Quiz: ObservableObject {
     /// - Parameter configuration: The quiz configuration to use for generating math equations.
     /// - Returns: An array of math equations.
     private static func generateEquations(using configuration: Configuration) -> [MathEquation] {
-        MathEquation.generate(amount: configuration.amountOfEquations, using: configuration.generatorSettings)
+        MathEquation.generate(amount: configuration.numberOfEquations, using: configuration.generatorSettings)
     }
     
     // MARK: Methods
@@ -84,9 +89,14 @@ class Quiz: ObservableObject {
     
     /// Restart the quiz.
     func restart() {
-        timeTaken = 0
         currentQuestion = questions.first!
-        start()
+        timeTaken = 0
+        
+        questions.forEach { question in
+            question.reset(timerAsWell: true)
+        }
+                
+        state = .notStarted
     }
     
     /// End the quiz.
@@ -106,6 +116,14 @@ class Quiz: ObservableObject {
         
         currentQuestion = questions[currentQuestionIndex + 1]
     }
+    
+    /// Updates the quiz according to the updated configuration.
+    func configurationUpdated() {
+        self.questions = Self.generateEquations(using: configuration)
+            .map { equation in Question(with: equation, timeToSolve: configuration.solveTime) }
+        self.currentQuestion = questions.first!
+        self.restart()
+    }
 }
 
 // MARK: - State
@@ -123,23 +141,5 @@ extension Quiz {
     
         /// The quiz has ended.
         case ended
-    }
-}
-
-// MARK: - Settings
-
-extension Quiz {
-    
-    /// A configuration structure for quizzes.
-    struct Configuration {
-        
-        /// The total amount of equations to include in the quiz.
-        var amountOfEquations: Int
-        
-        /// The amount of time given to solve each question.
-        var solveTime: Int
-        
-        /// The settings to use for generating equations.
-        var generatorSettings: MathEquation.GeneratorSettings
     }
 }

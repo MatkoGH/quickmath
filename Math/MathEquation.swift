@@ -94,7 +94,7 @@ extension MathEquation {
         switch operation {
         case .subtraction:
             let left = randomInt()
-            (lhs, rhs) = (left, randomInt(highest: !settings.negativeAnswerAllowed ? left : nil))
+            (lhs, rhs) = (left, randomInt(highest: left))
         case .division:
             let (left, right) = (randomInt(), randomInt())
             (lhs, rhs) = (left * right, right)
@@ -109,7 +109,7 @@ extension MathEquation {
     struct GeneratorSettings {
         
         /// The lowest number to use in an equation. Defaults to 1.
-        var lowestNumber: Int = 1
+        var lowestNumber: Int
         
         /// The highest number to use in an equation.
         var highestNumber: Int
@@ -120,9 +120,6 @@ extension MathEquation {
         }
         
         /// An array of operations for the generator to use.  Defaults to all.
-        var operations: [MathOperation] = MathOperation.all
-        
-        /// Boolean value indicating whether the generator should generate equations that have a negative answer. Defaults to false.
-        var negativeAnswerAllowed: Bool = false
+        var operations: [MathOperation]
     }
 }

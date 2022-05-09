@@ -9,18 +9,25 @@ import SwiftUI
 
 extension View {
     
+    /// Fills the container view.
     func fillContainer() -> some View {
         modifier(FillContainerModifier())
     }
     
+    /// Adds a style of padding to the view.
+    /// - Parameter style: The padding style to add.
     func padding(style: PaddingModifier.Style = .default) -> some View {
         modifier(PaddingModifier(style: style))
     }
     
+    /// Adds a round background to the view with a provided color.
+    /// - Parameter color: The color to set the round background to.
     func roundBackground(color: Color) -> some View {
         modifier(ColorRoundBackgroundModifier(color: color))
     }
     
+    /// Adds a round background to the view with a provided material.
+    /// - Parameter material: The material to set the round background to.
     func roundBackground(material: Material) -> some View {
         modifier(MaterialRoundBackgroundModifier(material: material))
     }
@@ -35,6 +42,7 @@ struct FillContainerModifier: ViewModifier {
 
 struct PaddingModifier: ViewModifier {
     
+    /// The padding style.
     var style: Style
     
     func body(content: Content) -> some View {
@@ -55,6 +63,7 @@ struct PaddingModifier: ViewModifier {
 
 struct ColorRoundBackgroundModifier: ViewModifier {
     
+    /// The color.
     var color: Color
     
     func body(content: Content) -> some View {
@@ -64,6 +73,7 @@ struct ColorRoundBackgroundModifier: ViewModifier {
 
 struct MaterialRoundBackgroundModifier: ViewModifier {
     
+    /// The material.
     var material: Material
     
     func body(content: Content) -> some View {

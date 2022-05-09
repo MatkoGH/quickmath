@@ -5,12 +5,15 @@
 //  Created by Martin Stric on 2022-04-19.
 //
 
-import Foundation
+import SwiftUI
 import PencilKit
 
 // MARK: - Question
 
 extension Quiz {
+    
+    /// A quiz question answer number.
+    typealias AnswerNumber = Int
     
     /// A quiz question structure.
     class Question: Equatable, Identifiable, ObservableObject {
@@ -21,48 +24,112 @@ extension Quiz {
         /// The math equation.
         let equation: MathEquation
         
+        /// The amount of time given to solve this question.
+        let timeToSolve: TimeInterval?
+        
         /// Canvas view for the question's drawing input.
         @Published var canvasView: PKCanvasView = .init()
         
+        /// The user's answer to the question.
+        @Published private(set) var answer: AnswerNumber? = nil
+        
         /// The answer state of the question.
-        @Published private(set) var answerState: AnswerState = .answering(nil)
+        @Published private(set) var answerState: AnswerState? = nil
         
         /// The time left to answer the equation.
-        @Published private(set) var timeLeft: TimeInterval = 1.0
+        @Published private(set) var timeLeft: TimeInterval?
+        
+        /// The timer for the question.
+        private var timer: Timer?
+        
+        // MARK: Computed
         
         /// The answer to the equation.
         var equationAnswer: Int {
             equation.answer
         }
         
-        func startTimer() {
-            
-        }
+        // MARK: Methods
         
         /// Sets the current answer state.
         /// - Parameter number: The number to set the current answer to.
         func answer(number: Int?) {
-            answerState = .answering(number)
+            guard number != nil, answerState == nil else {
+                answer = number != nil ? answer : nil
+                answerState = number != nil ? answerState : nil
+                return
+            }
+            
+            answer = number
             checkCurrentAnswer()
+        }
+        
+        /// Sets the current answer state to skipped.
+        func skip() {
+            answerState = .skipped
+            timer?.invalidate()
         }
         
         /// Checks if the current answer is correct. Sets answer state.
         func checkCurrentAnswer(timeRanOut: Bool = false) {
-            if case .answering(let number) = answerState, let number = number, (number == equationAnswer || timeRanOut) {
-                self.answerState = .answered(number == equationAnswer)
+            answerState = isCorrect() ? .correct : (timeRanOut ? .incorrect : nil)
+            
+            if answerState?.isCorrect != nil {
+                timer?.invalidate()
             }
         }
         
-        /// Resets the canvas' drawing.
-        func clearAnswer() {
+        /// Start the question's timer.
+        func startTimer() {
+            guard timeLeft != nil else { return }
+
+            timer?.invalidate()
+            timer = .scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                if self.timeLeft! <= 0 {
+                    withAnimation(.defaultSpring) { self.checkCurrentAnswer(timeRanOut: true) }
+                    self.timer?.invalidate()
+                    return
+                }
+                
+                self.timeLeft! -= 1
+            }
+        }
+        
+        /// Resets the question.
+        /// - Parameter timerAsWell: Boolean indicating whether to reset the timer as well.
+        func reset(timerAsWell: Bool = false) {
+            if timerAsWell {
+                timer?.invalidate()
+                timeLeft = timeToSolve
+            }
+            
+            clearDrawing()
+            answer(number: nil)
+        }
+        
+        /// Checks whether answer is correct.
+        /// - Returns: Boolean indicating whether the answer is correct.
+        func isCorrect() -> Bool {
+            answer == equationAnswer
+        }
+        
+        /// Checks whether the question has been answered.
+        /// - Returns: Boolean indicating whether the question has been answered.
+        func hasAnswered() -> Bool {
+            answerState != nil
+        }
+        
+        /// Clear the question's canvas.
+        func clearDrawing() {
             canvasView.drawing = .init()
-            answerState = .answering(nil)
         }
         
         /// Create a quiz question.
         /// - Parameter equation: The question's equation.
-        init(with equation: MathEquation) {
+        init(with equation: MathEquation, timeToSolve: TimeInterval? = nil) {
             self.equation = equation
+            self.timeToSolve = timeToSolve
+            self.timeLeft = timeToSolve
         }
         
         /// Equivalent function. Checks ID's.
@@ -71,26 +138,28 @@ extension Quiz {
         }
     }
     
-    /// The answering state of a question.
-    enum AnswerState: Equatable {
+    /// Enum containing correct and incorrect values.
+    enum AnswerState {
         
-        /// Currently answering. With an optional value.
-        case answering(Int?)
+        /// The answer is correct.
+        case correct
         
-        /// Has answered. With a boolean indicating whether the answer is correct.
-        case answered(Bool)
+        /// The answer is incorrect.
+        case incorrect
         
-        /// Skipped the question.
+        /// The question was skipped.
         case skipped
-        
-        /// Computed boolean indicating whether the question has been answered.
-        var isAnswered: Bool {
-            self == .answered(true) || self == .answered(false)
-        }
-        
-        /// Computed boolean indicating whether the answer is correct.
-        var isCorrect: Bool {
-            self == .answered(true)
+    
+        /// Optional boolean indicating whether the answer is correct.
+        var isCorrect: Bool? {
+            switch self {
+            case .correct:
+                return true
+            case .incorrect:
+                return false
+            default:
+                return nil
+            }
         }
     }
 }
